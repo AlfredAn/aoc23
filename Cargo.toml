@@ -1,7 +1,9 @@
 [package]
-name = "day1b"
+name = "aoc23"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0.75"
+enum-map = "2.7.3"
 regex = "1.10.2"
