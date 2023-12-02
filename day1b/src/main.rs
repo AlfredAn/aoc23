@@ -1,6 +1,6 @@
 use std::io::BufRead;
 
-use regex::{Match, Regex};
+use regex::Regex;
 
 fn to_digit(s: &str) -> u32 {
     match s {
@@ -25,9 +25,17 @@ fn main() {
 
     let mut sum = 0;
     for line in lines.map(Result::unwrap) {
-        let matches: Vec<_> = re.find_iter(&line).map(|m| m.as_str().to_owned()).collect();
-        let first = &**matches.first().unwrap();
-        let last = &**matches.last().unwrap();
+        let first = re.find_iter(&line).next().unwrap().as_str();
+
+        let mut last = None;
+        for (i, _) in line.char_indices().rev() {
+            if let Some(m) = re.find(&line[i..]) {
+                last = Some(m.as_str());
+                break;
+            }
+        }
+        let last = last.unwrap();
+
         let number = to_digit(first) * 10 + to_digit(last);
         sum += number;
 
