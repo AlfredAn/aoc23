@@ -32,17 +32,13 @@ fn parser() -> impl Parser<char, (Seeds, Vec<RangeMap>), Error = Simple<char>> {
     let map = map_label.ignore_then(map_range.repeated().map(|mut ranges| {
         ranges.sort_by_key(|(range, _)| range.start);
         itertools::chain!(
-            ranges.first().map(|(first, _)| (0..first.start, 0)),
-            ranges
-                .iter()
-                .cloned()
-                .tuple_windows()
-                .flat_map(|((r0, o0), (r1, _))| [(r0.clone(), o0), (r0.end..r1.start, 0)]),
-            ranges
-                .last()
-                .into_iter()
-                .flat_map(|(last, off)| [(last.clone(), *off), (last.end..(1 << 62), 0)]),
+            ranges.first().map(|(r, _)| (0..r.start, 0)),
+            ranges.iter().cloned(),
+            ranges.last().map(|(r, _)| (r.end..(1 << 62), 0)),
+            std::iter::once(((1 << 62)..(1 << 62), 0))
         )
+        .tuple_windows()
+        .flat_map(|((r0, o0), (r1, _))| [(r0.clone(), o0), (r0.end..r1.start, 0)])
         .filter(|(range, _)| !range.is_empty())
         .collect()
     }));
