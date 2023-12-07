@@ -3,8 +3,13 @@ name = "aoc23"
 version = "0.1.0"
 edition = "2021"
 
+[profile.release]
+lto = "thin"
+codegen-units = 1
+
 [dependencies]
 anyhow = "1.0.75"
+arrayvec = "0.7.4"
 chumsky = "0.9.3"
 enum-map = "2.7.3"
 itertools = "0.12.0"
