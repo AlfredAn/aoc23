@@ -10,9 +10,9 @@ struct Race {
 fn parser() -> impl Parser<char, Race, Error = Simple<char>> {
     let int = text::int(10).from_str::<u64>().unwrapped().padded();
 
-    let long_int = int.then(int.repeated()).foldl(|a, b| {
-        a * 10u64.pow(b.ilog10() + 1) + b
-    });
+    let long_int = int
+        .then(int.repeated())
+        .foldl(|a, b| a * 10u64.pow(b.ilog10() + 1) + b);
 
     let time = just("Time:").ignore_then(long_int);
     let record = just("Distance:").ignore_then(long_int);
