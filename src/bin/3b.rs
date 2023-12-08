@@ -24,9 +24,8 @@ fn main() {
             let xmax = m.range().end.min(line.len() - 1);
 
             let mut is_part = false;
-            'outer: for y in ymin..=ymax {
-                for x in xmin..=xmax {
-                    let c = lines[y][x];
+            'outer: for line in &lines[ymin..=ymax] {
+                for &c in &line[xmin..=xmax] {
                     if !c.is_ascii_digit() && c != b'.' {
                         is_part = true;
                         break 'outer;
@@ -45,6 +44,7 @@ fn main() {
 
             println!("part: {n}");
 
+            #[allow(clippy::needless_range_loop)]
             for y in ymin..=ymax {
                 for x in xmin..=xmax {
                     let c = lines[y][x];

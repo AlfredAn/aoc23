@@ -23,9 +23,8 @@ fn main() {
             let xmin = m.range().start.saturating_sub(1);
             let xmax = m.range().end.min(line.len() - 1);
 
-            'outer: for y in ymin..=ymax {
-                for x in xmin..=xmax {
-                    let c = lines[y][x];
+            'outer: for line in &lines[ymin..=ymax] {
+                for &c in &line[xmin..=xmax] {
                     if !c.is_ascii_digit() && c != b'.' {
                         let n = std::str::from_utf8(m.as_bytes())
                             .unwrap()

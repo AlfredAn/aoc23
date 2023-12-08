@@ -28,12 +28,12 @@ fn hand_type(hand: Hand) -> HandType {
         .collect_vec();
 
     match counts.as_slice() {
-        &[5, ..] => HandType::FiveOfAKind,
-        &[4, ..] => HandType::FourOfAKind,
-        &[3, 2, ..] => HandType::FullHouse,
-        &[3, ..] => HandType::ThreeOfAKind,
-        &[2, 2, ..] => HandType::TwoPair,
-        &[2, ..] => HandType::OnePair,
+        [5, ..] => HandType::FiveOfAKind,
+        [4, ..] => HandType::FourOfAKind,
+        [3, 2, ..] => HandType::FullHouse,
+        [3, ..] => HandType::ThreeOfAKind,
+        [2, 2, ..] => HandType::TwoPair,
+        [2, ..] => HandType::OnePair,
         _ => HandType::HighCard,
     }
 }
