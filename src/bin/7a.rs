@@ -39,7 +39,7 @@ fn hand_type(hand: Hand) -> HandType {
 }
 
 fn parser() -> impl Parser<char, Vec<(Hand, Bid)>, Error = Simple<char>> {
-    const CARDS: &'static str = "23456789TJQKA";
+    const CARDS: &str = "23456789TJQKA";
     let card = one_of(CARDS).map(|c: char| {
         CARDS
             .chars()

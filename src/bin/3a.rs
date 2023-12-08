@@ -19,7 +19,7 @@ fn main() {
         let ymin = y.saturating_sub(1);
         let ymax = (y + 1).min(lines.len() - 1);
 
-        for m in re.find_iter(&line) {
+        for m in re.find_iter(line) {
             let xmin = m.range().start.saturating_sub(1);
             let xmax = m.range().end.min(line.len() - 1);
 

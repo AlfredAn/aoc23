@@ -8,7 +8,7 @@ type Card = u8;
 type Hand = [Card; 5];
 type Bid = u16;
 
-const CARDS: &'static str = "J23456789TQKA";
+const CARDS: &str = "J23456789TQKA";
 const JOKER: Card = 0;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
