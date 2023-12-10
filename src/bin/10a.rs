@@ -49,7 +49,7 @@ fn parser() -> impl Parser<char, Array2<Square>, Error = Simple<char>> {
             let cols = vv.iter().map(|v| v.len()).all_equal_value().map_err(|e| {
                 Simple::custom(
                     span.clone(),
-                    format!("inconsistend number of columns: {:?}", e),
+                    format!("inconsistent number of columns: {:?}", e),
                 )
             })?;
             let rows = vv.len();

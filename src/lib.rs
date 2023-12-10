@@ -1,5 +1,7 @@
 use std::{fmt, io::Read};
 
+use num::traits::AsPrimitive;
+
 pub fn read_stdin_to_bytes() -> Vec<u8> {
     let mut buf = Vec::new();
     std::io::stdin().lock().read_to_end(&mut buf).unwrap();
@@ -30,4 +32,8 @@ pub fn display<F: Fn(&mut fmt::Formatter<'_>) -> fmt::Result>(
     f: F,
 ) -> impl fmt::Debug + fmt::Display {
     Display(f)
+}
+
+pub fn arr_as<A: AsPrimitive<B>, B: 'static + Copy, const N: usize>(a: [A; N]) -> [B; N] {
+    a.map(AsPrimitive::as_)
 }
