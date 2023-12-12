@@ -50,7 +50,7 @@ fn neighbors(grid: &Array2<u8>, pos: [usize; 2]) -> impl Iterator<Item = [usize;
     let (h, w) = grid.dim();
     let dim = [h, w];
     connections(grid[pos])
-        .into_iter()
+        .iter()
         .map(move |&delta| arr_as(vec2_add(arr_as(pos), delta)))
         .filter(move |neighbor| iter::zip(neighbor, dim).all(|(&n, d)| n < d))
 }

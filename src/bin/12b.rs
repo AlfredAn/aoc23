@@ -68,7 +68,7 @@ fn combinations(
                 }
             };
             let damaged = |cache| {
-                if groups.len() > 0 && consec < groups[0] {
+                if !groups.is_empty() && consec < groups[0] {
                     combinations(ss, groups, consec + 1, cache)
                 } else {
                     0
