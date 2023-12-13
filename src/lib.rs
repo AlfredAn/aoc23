@@ -1,6 +1,10 @@
-use std::{fmt, io::Read};
+use std::{fmt, io::Read, ops::Range};
 
+use chumsky::error::Simple;
+use itertools::Itertools;
+use ndarray::{Array2, ShapeError};
 use num::traits::AsPrimitive;
+use thiserror::Error;
 
 pub fn read_stdin_to_bytes() -> Vec<u8> {
     let mut buf = Vec::new();
@@ -36,4 +40,30 @@ pub fn display<F: Fn(&mut fmt::Formatter<'_>) -> fmt::Result>(
 
 pub fn arr_as<A: AsPrimitive<B>, B: 'static + Copy, const N: usize>(a: [A; N]) -> [B; N] {
     a.map(AsPrimitive::as_)
+}
+
+#[derive(Error, Debug)]
+pub enum ToArrayError {
+    #[error("Inconsistent number of columns: {0:?}")]
+    ColumnCount(Option<(usize, usize)>),
+    #[error("{0}")]
+    ShapeError(ShapeError),
+}
+
+pub fn to_array2<T>(vv: Vec<Vec<T>>) -> Result<Array2<T>, ToArrayError> {
+    let width = vv
+        .iter()
+        .map(Vec::len)
+        .all_equal_value()
+        .map_err(ToArrayError::ColumnCount)?;
+    let height = vv.len();
+    Array2::from_shape_vec((height, width), vv.into_iter().flatten().collect_vec())
+        .map_err(ToArrayError::ShapeError)
+}
+
+pub fn chumsky_err<T, E: std::error::Error>(
+    res: Result<T, E>,
+    span: Range<usize>,
+) -> Result<T, Simple<char>> {
+    res.map_err(|err| Simple::custom(span, err.to_string()))
 }
