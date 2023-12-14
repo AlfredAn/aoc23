@@ -67,3 +67,7 @@ pub fn chumsky_err<T, E: std::error::Error>(
 ) -> Result<T, Simple<char>> {
     res.map_err(|err| Simple::custom(span, err.to_string()))
 }
+
+pub fn parse_stdin<T>(parser: impl chumsky::Parser<char, T, Error = Simple<char>>) -> T {
+    parser.parse(read_stdin_to_string()).unwrap()
+}
