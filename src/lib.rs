@@ -71,3 +71,45 @@ pub fn chumsky_err<T, E: std::error::Error>(
 pub fn parse_stdin<T>(parser: impl chumsky::Parser<char, T, Error = Simple<char>>) -> T {
     parser.parse(read_stdin_to_string()).unwrap()
 }
+
+pub use winnow_util::*;
+
+mod winnow_util {
+    use itertools::chain;
+    use nalgebra::{DMatrix, Scalar};
+    use winnow::{
+        ascii::line_ending,
+        combinator::{repeat, repeat_till0},
+        error::ContextError,
+        prelude::*,
+    };
+
+    pub fn matrix<'a, T>(
+        mut element: impl Parser<&'a str, T, ContextError>,
+    ) -> impl Parser<&'a str, DMatrix<T>, ContextError>
+    where
+        T: Scalar,
+    {
+        move |input: &mut &'a str| {
+            let first_row: Vec<_> = repeat_till0(element.by_ref(), line_ending)
+                .parse_next(input)?
+                .0;
+            let ncols = first_row.len();
+
+            let rows: Vec<_> = repeat(
+                ..,
+                (repeat(ncols, element.by_ref()), line_ending).map(|(v, _): (Vec<_>, _)| v),
+            )
+            .parse_next(input)?;
+
+            let nrows = rows.len() + 1;
+
+            Ok(DMatrix::from_iterator(
+                nrows,
+                ncols,
+                chain(std::iter::once(first_row), rows).flatten(),
+            )
+            .transpose())
+        }
+    }
+}
