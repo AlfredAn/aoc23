@@ -1,4 +1,4 @@
-use aoc23::{matrix, read_stdin_to_string};
+use aoc23::{matrix, offset, read_stdin_to_string};
 use nalgebra::DMatrix;
 use rustc_hash::FxHashSet;
 use std::fmt;
@@ -24,13 +24,6 @@ impl fmt::Display for Tile {
 fn tile(input: &mut &str) -> PResult<Tile> {
     any.verify_map(|c| u8::try_from(c).ok().and_then(|c| Tile::from_repr(c)))
         .parse_next(input)
-}
-
-fn offset(pos: (usize, usize), delta: (isize, isize)) -> Option<(usize, usize)> {
-    Some((
-        usize::try_from(pos.0 as isize + delta.0).ok()?,
-        usize::try_from(pos.1 as isize + delta.1).ok()?,
-    ))
 }
 
 fn shoot_beam(

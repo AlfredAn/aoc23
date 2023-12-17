@@ -18,7 +18,8 @@ pub fn read_stdin_to_string() -> String {
     buf
 }
 
-struct Display<F>(F);
+#[derive(Clone)]
+pub struct Display<F>(F);
 
 impl<F: Fn(&mut fmt::Formatter<'_>) -> fmt::Result> fmt::Debug for Display<F> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -32,9 +33,7 @@ impl<F: Fn(&mut fmt::Formatter<'_>) -> fmt::Result> fmt::Display for Display<F> 
     }
 }
 
-pub fn display<F: Fn(&mut fmt::Formatter<'_>) -> fmt::Result>(
-    f: F,
-) -> impl fmt::Debug + fmt::Display {
+pub fn display<F: Fn(&mut fmt::Formatter<'_>) -> fmt::Result>(f: F) -> Display<F> {
     Display(f)
 }
 
@@ -70,6 +69,27 @@ pub fn chumsky_err<T, E: std::error::Error>(
 
 pub fn parse_stdin<T>(parser: impl chumsky::Parser<char, T, Error = Simple<char>>) -> T {
     parser.parse(read_stdin_to_string()).unwrap()
+}
+
+pub fn offset(pos: (usize, usize), delta: (isize, isize)) -> Option<(usize, usize)> {
+    Some((
+        usize::try_from(pos.0 as isize + delta.0).ok()?,
+        usize::try_from(pos.1 as isize + delta.1).ok()?,
+    ))
+}
+
+pub fn bounded_offset(
+    pos: (usize, usize),
+    delta: (isize, isize),
+    size: (usize, usize),
+) -> Option<(usize, usize)> {
+    offset(pos, delta).and_then(|pos| {
+        if pos.0 < size.0 && pos.1 < size.1 {
+            Some(pos)
+        } else {
+            None
+        }
+    })
 }
 
 pub use winnow_util::*;
