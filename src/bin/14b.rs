@@ -49,10 +49,9 @@ fn tilt_north(grid: &mut ArrayBase<ViewRepr<&mut Tile>, Dim<[usize; 2]>>) {
 fn calc_load(grid: &Array2<Tile>) -> u64 {
     let mut load = 0;
     for col in grid.columns() {
-        for (i, tile) in col.iter().enumerate() {
-            match tile {
-                Tile::Round => load += (col.len() - i) as u64,
-                _ => (),
+        for (i, &tile) in col.iter().enumerate() {
+            if tile == Tile::Round {
+                load += (col.len() - i) as u64
             }
         }
     }
@@ -101,7 +100,7 @@ fn main() {
         println!("period={period}");
         println!("start={start}");
 
-        let cycle = &loads[start-period..start];
+        let cycle = &loads[start - period..start];
         println!("all: {loads:?}");
         println!("cycle: {cycle:?}");
 

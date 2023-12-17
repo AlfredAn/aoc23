@@ -18,7 +18,7 @@ fn parser() -> impl Parser<char, Vec<(String, Op)>, Error = Simple<char>> {
     let op = choice((
         just('-').to(Op::Remove),
         just('=')
-            .ignore_then(filter(|c| ('1'..='9').contains(&c)))
+            .ignore_then(filter(|c| ('1'..='9').contains(c)))
             .map(|c| Op::Add(c.to_digit(10).unwrap() as u8)),
     ));
 
@@ -65,7 +65,7 @@ fn solve() -> u64 {
         .iter()
         .enumerate()
         .flat_map(|(i, b)| {
-            b.into_iter()
+            b.iter()
                 .enumerate()
                 .map(move |(j, (_, f))| (i as u64 + 1) * (j as u64 + 1) * (*f as u64))
         })

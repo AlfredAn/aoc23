@@ -3,7 +3,7 @@ use chumsky::{prelude::*, text::newline};
 use derive_more::Display;
 use ndarray::Array2;
 
-#[derive(Debug, Display, Clone, Copy)]
+#[derive(Debug, Display, Clone, Copy, PartialEq, Eq)]
 enum Tile {
     #[display(fmt = ".")]
     Empty,
@@ -48,10 +48,9 @@ fn tilt_north(grid: &mut Array2<Tile>) {
 fn calc_load(grid: &Array2<Tile>) -> u64 {
     let mut load = 0;
     for col in grid.columns() {
-        for (i, tile) in col.iter().enumerate() {
-            match tile {
-                Tile::Round => load += (col.len() - i) as u64,
-                _ => (),
+        for (i, &tile) in col.iter().enumerate() {
+            if tile == Tile::Round {
+                load += (col.len() - i) as u64
             }
         }
     }

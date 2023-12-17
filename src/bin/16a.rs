@@ -22,7 +22,7 @@ impl fmt::Display for Tile {
 }
 
 fn tile(input: &mut &str) -> PResult<Tile> {
-    any.verify_map(|c| u8::try_from(c).ok().and_then(|c| Tile::from_repr(c)))
+    any.verify_map(|c| u8::try_from(c).ok().and_then(Tile::from_repr))
         .parse_next(input)
 }
 
