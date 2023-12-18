@@ -6,8 +6,7 @@ use std::{
 use aoc23::read_stdin_to_string;
 use derive_more::Display;
 use itertools::Itertools;
-use nalgebra::{DMatrix, Vector2};
-use rustc_hash::FxHashSet;
+use nalgebra::Vector2;
 use winnow::{
     ascii::{dec_uint, line_ending, space0, space1},
     combinator::{delimited, dispatch, fail, preceded, repeat, success},
@@ -36,7 +35,7 @@ impl Dir {
 }
 
 #[derive(Debug, Display, Clone)]
-#[display(fmt = "{dir} {len} ({color})")]
+#[display(fmt = "{dir} {len} (#{color})")]
 struct Instruction {
     dir: Dir,
     len: u64,
@@ -70,60 +69,6 @@ fn line(input: &mut &str) -> PResult<Instruction> {
         .parse_next(input)
 }
 
-fn solve_a(lines: impl IntoIterator<Item = (Dir, u64)>) -> u64 {
-    let mut dug = FxHashSet::default();
-    let mut pos = Vector2::zeros();
-
-    dug.insert(pos);
-
-    for (dir, len) in lines {
-        for _ in 0..len {
-            pos += dir.to_vec();
-            dug.insert(pos);
-        }
-    }
-
-    let (xmin, xmax) = dug.iter().map(|v| v.x).minmax().into_option().unwrap();
-    let (ymin, ymax) = dug.iter().map(|v| v.y).minmax().into_option().unwrap();
-
-    let matrix = DMatrix::from_fn(
-        (ymax - ymin + 1) as usize,
-        (xmax - xmin + 1) as usize,
-        |y, x| {
-            if dug.contains(&Vector2::new(x as i64 + xmin, y as i64 + ymin)) {
-                '#'
-            } else {
-                '.'
-            }
-        },
-    );
-
-    let mut total = 0u64;
-    for y in ymin..=ymax {
-        let mut above_inside = false;
-        let mut below_inside = false;
-
-        let mut row = 0u64;
-
-        for x in xmin..=xmax {
-            let [edge_here, edge_above, edge_below] =
-                [(x, y), (x, y - 1), (x, y + 1)].map(|(x, y)| dug.contains(&Vector2::new(x, y)));
-
-            if edge_here {
-                above_inside ^= edge_above;
-                below_inside ^= edge_below;
-            }
-
-            if edge_here || above_inside || below_inside {
-                row += 1;
-            }
-        }
-        total += row;
-    }
-
-    total
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum Corner {
     TopLeft,
@@ -138,9 +83,9 @@ enum Hit {
     Flat,
 }
 
-fn solve_b(lines: &[(Dir, u64)]) -> u64 {
+fn solve(lines: &[(Dir, u64)]) -> u64 {
     let corners = lines
-        .into_iter()
+        .iter()
         .circular_tuple_windows()
         .scan(Vector2::zeros(), |pos, (&(dir1, len), &(dir2, _))| {
             *pos += dir1.to_vec() * (len as i64);
@@ -229,10 +174,7 @@ fn solve_b(lines: &[(Dir, u64)]) -> u64 {
             let (x1, (left_sum, right_sum)) = a.unwrap();
             let dx = if let Some((x2, _)) = b { x2 - x1 } else { 1 };
 
-            let partial_sum = left_sum + (dx - 1) * right_sum;
-            //dbg!(partial_sum);
-
-            partial_sum as u64
+            (left_sum + (dx - 1) * right_sum) as u64
         })
         .sum::<u64>()
 }
@@ -241,8 +183,12 @@ fn main() {
     let input = read_stdin_to_string();
     let lines: Vec<_> = repeat(.., line).parse(input.as_str()).unwrap();
 
-    let a_lines = || lines.iter().map(|&Instruction { dir, len, .. }| (dir, len));
-    let b_lines = || {
+    let a_lines = lines
+        .iter()
+        .map(|&Instruction { dir, len, .. }| (dir, len))
+        .collect_vec();
+
+    let b_lines = {
         lines.iter().map(|Instruction { color, .. }| {
             let (a, b) = color.split_at(5);
             (
@@ -256,11 +202,12 @@ fn main() {
                 u64::from_str_radix(a, 16).unwrap(),
             )
         })
-    };
+    }
+    .collect_vec();
 
-    let a = solve_a(a_lines());
+    let a = solve(&a_lines);
     println!("a: {a}");
 
-    let b = solve_b(&b_lines().collect_vec());
+    let b = solve(&b_lines);
     println!("b: {b}");
 }
