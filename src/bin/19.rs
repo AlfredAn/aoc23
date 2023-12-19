@@ -2,6 +2,7 @@ use std::ops::Range;
 
 use aoc23::read_stdin_to_string;
 use enum_map::{enum_map, Enum, EnumMap};
+use itertools::Itertools;
 use rangetools::Rangetools;
 use rustc_hash::FxHashMap;
 use winnow::{
@@ -20,53 +21,10 @@ enum Category {
     S,
 }
 
-fn category(input: &mut &str) -> PResult<Category> {
-    trace(
-        "category",
-        dispatch!(any;
-            'x' => success(Category::X),
-            'm' => success(Category::M),
-            'a' => success(Category::A),
-            's' => success(Category::S),
-            _ => fail
-        ),
-    )
-    .parse_next(input)
-}
-
 #[derive(Debug, Clone, Copy)]
 enum Condition {
     GreaterThan(u16),
     LessThan(u16),
-}
-
-impl Condition {
-    fn test(self, val: u16) -> bool {
-        match self {
-            Self::GreaterThan(n) => val > n,
-            Self::LessThan(n) => val < n,
-        }
-    }
-}
-
-fn condition(input: &mut &str) -> PResult<Condition> {
-    trace(
-        "condition",
-        dispatch!((any, dec_uint);
-            ('>', n) => success(Condition::GreaterThan(n)),
-            ('<', n) => success(Condition::LessThan(n)),
-            _ => fail
-        ),
-    )
-    .parse_next(input)
-}
-
-fn tag(input: &mut &str) -> PResult<String> {
-    trace(
-        "tag",
-        take_while(1.., |c: char| c.is_ascii_lowercase()).map(Into::into),
-    )
-    .parse_next(input)
 }
 
 #[derive(Debug, Clone)]
@@ -76,36 +34,11 @@ enum Action {
     Goto(String),
 }
 
-fn action(input: &mut &str) -> PResult<Action> {
-    trace(
-        "action",
-        alt((
-            'A'.map(|_| Action::Accept),
-            'R'.map(|_| Action::Reject),
-            tag.map(|tag| Action::Goto(tag)),
-        )),
-    )
-    .parse_next(input)
-}
-
 #[derive(Debug, Clone)]
 struct Rule {
     category: Category,
     condition: Condition,
     action: Action,
-}
-
-fn rule(input: &mut &str) -> PResult<Rule> {
-    trace(
-        "rule",
-        seq! {Rule {
-            category: category,
-            condition: condition,
-            _: ':',
-            action: action,
-        }},
-    )
-    .parse_next(input)
 }
 
 #[derive(Debug, Clone)]
@@ -114,94 +47,7 @@ struct Workflow {
     default: Action,
 }
 
-fn workflow(input: &mut &str) -> PResult<(String, Workflow)> {
-    trace(
-        "workflow",
-        seq!(
-            tag,
-            _: '{',
-            repeat(.., terminated(rule, ',')),
-            action,
-            _: '}',
-        )
-        .map(|(tag, rules, default)| (tag, Workflow { rules, default })),
-    )
-    .parse_next(input)
-}
-
 type Part = EnumMap<Category, u16>;
-
-fn part(input: &mut &str) -> PResult<Part> {
-    trace(
-        "part",
-        seq!(
-            _: "{x=",
-            dec_uint,
-            _: ",m=",
-            dec_uint,
-            _: ",a=",
-            dec_uint,
-            _: ",s=",
-            dec_uint,
-            _: '}',
-        )
-        .map(|(x, m, a, s)| {
-            enum_map! {
-                Category::X => x,
-                Category::M => m,
-                Category::A => a,
-                Category::S => s
-            }
-        }),
-    )
-    .parse_next(input)
-}
-
-fn input_parser(input: &mut &str) -> PResult<(Vec<(String, Workflow)>, Vec<Part>)> {
-    trace(
-        "input_parser",
-        seq!(
-            repeat(.., preceded(multispace0, workflow)),
-            repeat(.., preceded(multispace0, part)),
-            _: multispace0,
-        ),
-    )
-    .parse_next(input)
-}
-
-fn solve_a(workflows: &FxHashMap<String, Workflow>, parts: &[Part]) -> u64 {
-    let mut sum = 0;
-
-    for part in parts {
-        let mut workflow = &workflows["in"];
-
-        let accepted = loop {
-            let mut action = &workflow.default;
-
-            for rule in &workflow.rules {
-                let val = part[rule.category];
-                if rule.condition.test(val) {
-                    action = &rule.action;
-                    break;
-                }
-            }
-
-            match action {
-                Action::Accept => break true,
-                Action::Reject => break false,
-                Action::Goto(tag) => workflow = &workflows[tag],
-            }
-        };
-
-        if accepted {
-            for (_, &n) in part {
-                sum += n as u64;
-            }
-        }
-    }
-
-    sum
-}
 
 fn combinations(
     workflows: &FxHashMap<String, Workflow>,
@@ -224,7 +70,7 @@ fn combinations(
             let count = count(&rs);
             (0, count)
         }
-        Action::Goto(tag) => combinations(workflows, &tag, 0, rs),
+        Action::Goto(tag) => combinations(workflows, tag, 0, rs),
     };
 
     match workflow.rules.get(index) {
@@ -261,6 +107,24 @@ fn combinations(
     }
 }
 
+fn solve_a(workflows: &FxHashMap<String, Workflow>, parts: &[Part]) -> u64 {
+    parts
+        .iter()
+        .map(|part| {
+            match combinations(
+                workflows,
+                "in",
+                0,
+                EnumMap::from_fn(|c| part[c]..part[c] + 1),
+            ) {
+                (0, _) => 0,
+                (1, _) => part.values().copied().map_into::<u64>().sum(),
+                _ => unreachable!(),
+            }
+        })
+        .sum()
+}
+
 fn solve_b(workflows: &FxHashMap<String, Workflow>) -> (u64, u64) {
     combinations(workflows, "in", 0, EnumMap::from_fn(|_| 1..4001))
 }
@@ -280,6 +144,119 @@ fn main() {
     let input = read_stdin_to_string();
     let (a, b) = solve(input.as_str());
     println!("a: {a}\nb: {b}");
+}
+
+fn category(input: &mut &str) -> PResult<Category> {
+    trace(
+        "category",
+        dispatch!(any;
+            'x' => success(Category::X),
+            'm' => success(Category::M),
+            'a' => success(Category::A),
+            's' => success(Category::S),
+            _ => fail
+        ),
+    )
+    .parse_next(input)
+}
+
+fn condition(input: &mut &str) -> PResult<Condition> {
+    trace(
+        "condition",
+        dispatch!((any, dec_uint);
+            ('>', n) => success(Condition::GreaterThan(n)),
+            ('<', n) => success(Condition::LessThan(n)),
+            _ => fail
+        ),
+    )
+    .parse_next(input)
+}
+
+fn tag(input: &mut &str) -> PResult<String> {
+    trace(
+        "tag",
+        take_while(1.., |c: char| c.is_ascii_lowercase()).map(Into::into),
+    )
+    .parse_next(input)
+}
+
+fn action(input: &mut &str) -> PResult<Action> {
+    trace(
+        "action",
+        alt((
+            'A'.map(|_| Action::Accept),
+            'R'.map(|_| Action::Reject),
+            tag.map(Action::Goto),
+        )),
+    )
+    .parse_next(input)
+}
+
+fn rule(input: &mut &str) -> PResult<Rule> {
+    trace(
+        "rule",
+        seq! {Rule {
+            category: category,
+            condition: condition,
+            _: ':',
+            action: action,
+        }},
+    )
+    .parse_next(input)
+}
+
+fn workflow(input: &mut &str) -> PResult<(String, Workflow)> {
+    trace(
+        "workflow",
+        seq!(
+            tag,
+            _: '{',
+            repeat(.., terminated(rule, ',')),
+            action,
+            _: '}',
+        )
+        .map(|(tag, rules, default)| (tag, Workflow { rules, default })),
+    )
+    .parse_next(input)
+}
+
+fn part(input: &mut &str) -> PResult<Part> {
+    trace(
+        "part",
+        seq!(
+            _: "{x=",
+            dec_uint,
+            _: ",m=",
+            dec_uint,
+            _: ",a=",
+            dec_uint,
+            _: ",s=",
+            dec_uint,
+            _: '}',
+        )
+        .map(|(x, m, a, s)| {
+            enum_map! {
+                Category::X => x,
+                Category::M => m,
+                Category::A => a,
+                Category::S => s
+            }
+        }),
+    )
+    .parse_next(input)
+}
+
+#[allow(clippy::type_complexity)]
+fn input_parser(input: &mut &str) -> PResult<(Vec<(String, Workflow)>, Vec<Part>)> {
+    trace(
+        "input_parser",
+        seq!(
+            repeat(.., preceded(multispace0, workflow)),
+            repeat(.., preceded(multispace0, part)),
+            _: multispace0,
+        ),
+    )
+    .parse_next(input)
 }
 
 #[cfg(test)]
