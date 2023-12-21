@@ -360,3 +360,17 @@ fn parser<'a>(input: &mut &'a str) -> PResult<Vec<(Tag<'a>, Module<'a>, Vec<Tag<
     )
     .parse_next(input)
 }
+
+#[cfg(test)]
+#[test]
+fn test() {
+    let ex = parser.parse(include_str!("../../in/20/ex")).unwrap();
+    let ex2 = parser.parse(include_str!("../../in/20/ex2")).unwrap();
+    let input = parser.parse(include_str!("../../in/20/i")).unwrap();
+
+    assert_eq!(solve_a(&ex), 32000000);
+    assert_eq!(solve_a(&ex2), 11687500);
+    assert_eq!(solve_a(&input), 684125385);
+
+    assert_eq!(solve_b(&input), 225872806380073);
+}
