@@ -1,0 +1,14 @@
+strict digraph g {
+    broadcaster[label="broadcaster"]
+    broadcaster -> a 
+    broadcaster -> b 
+    broadcaster -> c 
+    a[label="%a"]
+    a -> b 
+    b[label="%b"]
+    b -> c 
+    c[label="%c"]
+    c -> inv 
+    inv[label="&inv"]
+    inv -> a 
+}

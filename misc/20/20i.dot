@@ -1,0 +1,169 @@
+strict digraph g {
+    hm[label="%\N"]
+    hm -> lg 
+    ph[label="%\N"]
+    ph -> gr 
+    ph -> cd 
+    xs[label="%\N"]
+    xs -> st 
+    xs -> zf 
+    xc[label="%\N"]
+    xc -> vv 
+    xc -> bn 
+    fx[label="%\N"]
+    fx -> lx 
+    fx -> st 
+    dn[label="%\N"]
+    dn -> zc 
+    nd[label="%\N"]
+    nd -> lg 
+    nd -> tc 
+    pd[label="%\N"]
+    pd -> dn 
+    pd -> lg 
+    pc[label="%\N"]
+    pc -> gr 
+    lx[label="%\N"]
+    lx -> gp 
+    tc[label="%\N"]
+    tc -> kj 
+    tl[label="%\N"]
+    tl -> nn 
+    kk[label="%\N"]
+    kk -> xs 
+    gq[label="%\N"]
+    gq -> pd 
+    xq[label="%\N"]
+    xq -> st 
+    xq -> xj 
+    nn[label="%\N"]
+    nn -> bn 
+    nn -> xc 
+    st[label="&\N"]
+    st -> kk 
+    st -> fx 
+    st -> hz 
+    st -> lx 
+    st -> zb 
+    hb[label="&\N"]
+    hb -> rx 
+    xj[label="%\N"]
+    xj -> st 
+    xj -> vq 
+    sz[label="%\N"]
+    sz -> gr 
+    sz -> ph 
+    bz[label="%\N"]
+    bz -> kx 
+    vq[label="%\N"]
+    vq -> st 
+    vv[label="%\N"]
+    vv -> hh 
+    vv -> bn 
+    gp[label="%\N"]
+    gp -> st 
+    gp -> hz 
+    js[label="&\N"]
+    js -> hb 
+    lf[label="%\N"]
+    lf -> bn 
+    lf -> qg 
+    broadcaster[label="\N"]
+    broadcaster -> nd 
+    broadcaster -> fx 
+    broadcaster -> mc 
+    broadcaster -> lf 
+    cd[label="%\N"]
+    cd -> vr 
+    vr[label="%\N"]
+    vr -> qc 
+    vr -> gr 
+    kx[label="%\N"]
+    kx -> kc 
+    kx -> lg 
+    jr[label="%\N"]
+    jr -> bn 
+    jr -> tl 
+    gr[label="&\N"]
+    gr -> cz 
+    gr -> dh 
+    gr -> mc 
+    gr -> qc 
+    gr -> js 
+    gr -> nj 
+    gr -> cd 
+    qg[label="%\N"]
+    qg -> hq 
+    mc[label="%\N"]
+    mc -> gr 
+    mc -> cz 
+    nl[label="%\N"]
+    nl -> st 
+    nl -> ch 
+    hz[label="%\N"]
+    hz -> nl 
+    kt[label="%\N"]
+    kt -> gr 
+    kt -> jc 
+    zc[label="%\N"]
+    zc -> lg 
+    zc -> qn 
+    vj[label="%\N"]
+    vj -> rs 
+    zb[label="&\N"]
+    zb -> hb 
+    kc[label="%\N"]
+    kc -> gq 
+    qc[label="%\N"]
+    qc -> kt 
+    bn[label="&\N"]
+    bn -> qg 
+    bn -> hq 
+    bn -> rs 
+    bn -> lf 
+    bn -> bs 
+    bn -> vj 
+    bn -> tl 
+    cz[label="%\N"]
+    cz -> dh 
+    bs[label="&\N"]
+    bs -> hb 
+    jc[label="%\N"]
+    jc -> gr 
+    jc -> pc 
+    nj[label="%\N"]
+    nj -> sz 
+    kj[label="%\N"]
+    kj -> lg 
+    kj -> bz 
+    hh[label="%\N"]
+    hh -> jv 
+    hh -> bn 
+    hq[label="%\N"]
+    hq -> vj 
+    dh[label="%\N"]
+    dh -> nj 
+    ch[label="%\N"]
+    ch -> st 
+    ch -> kk 
+    jv[label="%\N"]
+    jv -> bn 
+    rs[label="%\N"]
+    rs -> jr 
+    zf[label="%\N"]
+    zf -> xq 
+    zf -> st 
+    qn[label="%\N"]
+    qn -> hm 
+    qn -> lg 
+    lg[label="&\N"]
+    lg -> gq 
+    lg -> bz 
+    lg -> tc 
+    lg -> nd 
+    lg -> rr 
+    lg -> kc 
+    lg -> dn 
+    rr[label="&\N"]
+    rr -> hb 
+}
