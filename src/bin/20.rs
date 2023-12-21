@@ -284,9 +284,7 @@ fn solve_b(input: &[(Tag, Module, Vec<Tag>)]) -> u64 {
 
     dbg!(&periods);
 
-    let res = periods.into_iter().map(|p| p as u64).product::<u64>();
-
-    res
+    periods.into_iter().map(|p| p as u64).product::<u64>()
 }
 
 fn print_dot(input: &[(Tag, Module, Vec<Tag>)]) {
