@@ -1,5 +1,3 @@
-use std::ops::Not;
-
 use aoc23::{bounded_offset, matrix, read_stdin_to_string};
 use nalgebra::DMatrix;
 use strum::Display;
@@ -67,10 +65,6 @@ fn solve_a(map: &Map, start: Pos, steps: u64) -> usize {
         .count()
 }
 
-fn solve_b(map: &Map, start: Pos, steps: u64) -> u64 {
-    todo!()
-}
-
 fn main() {
     let input = read_stdin_to_string();
     let (map, start) = parser.parse(input.as_str()).unwrap();
@@ -81,10 +75,6 @@ fn main() {
     for n in [6, 64] {
         println!("a({n}): {}", solve_a(&map, start, n));
     }
-
-    // for n in [6, 10, 50] {
-    //     println!("b({n}): {}", solve_b(&map, start, n));
-    // }
 }
 
 fn parser(input: &mut &str) -> PResult<(Map, Pos)> {

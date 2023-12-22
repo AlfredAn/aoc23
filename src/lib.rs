@@ -92,6 +92,17 @@ pub fn bounded_offset(
     })
 }
 
+pub fn wrapping_offset(
+    pos: (usize, usize),
+    delta: (isize, isize),
+    size: (usize, usize),
+) -> (usize, usize) {
+    (
+        (((pos.0 + size.0) as isize + delta.0) as usize) % size.0,
+        (((pos.1 + size.1) as isize + delta.1) as usize) % size.1,
+    )
+}
+
 pub use winnow_util::*;
 
 mod winnow_util {
