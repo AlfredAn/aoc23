@@ -18,6 +18,22 @@ enum Tile {
     Slope(Dir),
 }
 
+#[derive(Debug, Display, Clone, Copy, PartialEq, Eq)]
+#[rustfmt::skip]
+enum TileB {
+    #[strum(serialize=".")] Empty,
+    #[strum(serialize="#")] Blocked,
+}
+
+impl From<Tile> for TileB {
+    fn from(tile: Tile) -> Self {
+        match tile {
+            Tile::Blocked => Self::Blocked,
+            _ => Self::Empty,
+        }
+    }
+}
+
 impl std::fmt::Display for Tile {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -104,10 +120,62 @@ fn solve_a(map: &DMatrix<Tile>) -> u32 {
     longest[end]
 }
 
+#[derive(Debug)]
+enum Node {
+    Backtrack((usize, usize)),
+    Visit((usize, usize)),
+}
+
+fn solve_b(map: &DMatrix<Tile>) -> u32 {
+    let (start, end) = find_start_and_end(map);
+
+    let map = map.map(TileB::from);
+    println!("{map}");
+
+    let mut visited = map.map(|_| false);
+    let mut stack = vec![Node::Visit(start)];
+
+    let mut dist = 0;
+    let mut longest = 0;
+
+    while let Some(node) = stack.pop() {
+        match node {
+            Node::Backtrack(cur) => {
+                visited[cur] = false;
+                dist -= 1;
+            }
+            Node::Visit(cur) => {
+                visited[cur] = true;
+                dist += 1;
+                stack.push(Node::Backtrack(cur));
+
+                if cur == end {
+                    if dist > longest {
+                        println!("{longest}");
+                    }
+                    longest = longest.max(dist);
+                } else {
+                    stack.extend(
+                        Dir::iter()
+                            .filter_map(|dir| bounded_offset(cur, dir.delta(), map.shape()))
+                            .filter(|&neighbor| !visited[neighbor] && map[neighbor] == TileB::Empty)
+                            .map(Node::Visit),
+                    );
+                }
+            }
+        }
+    }
+
+    longest - 1
+}
+
 fn main() {
     let map = parser.parse(read_stdin_to_string().as_str()).unwrap();
     let a = solve_a(&map);
     println!("a: {a}");
+
+    let b = solve_b(&map);
+    println!("b: {b}");
 }
 
 fn parser(input: &mut &str) -> PResult<DMatrix<Tile>> {
@@ -131,4 +199,7 @@ fn test() {
 
     assert_eq!(solve_a(&ex), 94);
     assert_eq!(solve_a(&i), 2414);
+
+    assert_eq!(solve_b(&ex), 154);
+    assert_eq!(solve_b(&i), 6598);
 }
