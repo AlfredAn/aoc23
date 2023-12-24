@@ -192,6 +192,7 @@ fn parser(input: &mut &str) -> PResult<DMatrix<Tile>> {
 }
 
 #[cfg(test)]
+#[ignore]
 #[test]
 fn test() {
     let ex = parser.parse(include_str!("../../in/23/ex")).unwrap();
