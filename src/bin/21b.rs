@@ -192,7 +192,11 @@ fn solve_b(map: &Map, start: Pos, steps: u32) -> u64 {
     state.set(start, 1);
     state.n_even += 1;
 
-    for _ in 0..steps {
+    for i in 0..steps {
+        if i % 1000 == 0 {
+            println!("{i}");
+        }
+
         //dbg!(depth);
         state.step();
         //dbg!(state.n_even, state.n_odd);
@@ -220,7 +224,7 @@ fn main() {
     //     println!("a({n}): {}", solve_a(&map, start, n));
     // }
 
-    for n in [6, 10, 50, 100, 500, 1000, 5000] {
+    for n in [6, 10, 50, 100, 500, 1000, 5000, 26501365] {
         println!("b({n}): {}", solve_b(&map, start, n));
     }
 }
